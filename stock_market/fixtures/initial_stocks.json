@@ -1,0 +1,222 @@
+[
+  {
+    "model": "stock_market.stock",
+    "pk": 1,
+    "fields": {
+      "ticker": "AAPL",
+      "company_name": "Apple Inc.",
+      "current_price": "175.50",
+      "current_daily_high": "175.50",
+      "current_daily_low": "175.50"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 2,
+    "fields": {
+      "ticker": "TSLA",
+      "company_name": "Tesla Inc.",
+      "current_price": "210.20",
+      "current_daily_high": "210.20",
+      "current_daily_low": "210.20"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 3,
+    "fields": {
+      "ticker": "MSFT",
+      "company_name": "Microsoft Corporation",
+      "current_price": "350.75",
+      "current_daily_high": "350.75",
+      "current_daily_low": "350.75"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 4,
+    "fields": {
+      "ticker": "AMZN",
+      "company_name": "Amazon.com Inc.",
+      "current_price": "145.00",
+      "current_daily_high": "145.00",
+      "current_daily_low": "145.00"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 5,
+    "fields": {
+      "ticker": "NVDA",
+      "company_name": "NVIDIA Corporation",
+      "current_price": "480.10",
+      "current_daily_high": "480.10",
+      "current_daily_low": "480.10"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 6,
+    "fields": {
+      "ticker": "GOOGL",
+      "company_name": "Alphabet Inc.",
+      "current_price": "130.25",
+      "current_daily_high": "130.25",
+      "current_daily_low": "130.25"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 7,
+    "fields": {
+      "ticker": "META",
+      "company_name": "Meta Platforms Inc.",
+      "current_price": "312.40",
+      "current_daily_high": "312.40",
+      "current_daily_low": "312.40"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 8,
+    "fields": {
+      "ticker": "BRK.B",
+      "company_name": "Berkshire Hathaway Inc.",
+      "current_price": "360.15",
+      "current_daily_high": "360.15",
+      "current_daily_low": "360.15"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 9,
+    "fields": {
+      "ticker": "LLY",
+      "company_name": "Eli Lilly & Co.",
+      "current_price": "590.80",
+      "current_daily_high": "590.80",
+      "current_daily_low": "590.80"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 10,
+    "fields": {
+      "ticker": "V",
+      "company_name": "Visa Inc.",
+      "current_price": "240.50",
+      "current_daily_high": "240.50",
+      "current_daily_low": "240.50"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 11,
+    "fields": {
+      "ticker": "JPM",
+      "company_name": "JPMorgan Chase & Co.",
+      "current_price": "148.30",
+      "current_daily_high": "148.30",
+      "current_daily_low": "148.30"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 12,
+    "fields": {
+      "ticker": "UNH",
+      "company_name": "UnitedHealth Group Inc.",
+      "current_price": "525.60",
+      "current_daily_high": "525.60",
+      "current_daily_low": "525.60"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 13,
+    "fields": {
+      "ticker": "WMT",
+      "company_name": "Walmart Inc.",
+      "current_price": "162.10",
+      "current_daily_high": "162.10",
+      "current_daily_low": "162.10"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 14,
+    "fields": {
+      "ticker": "XOM",
+      "company_name": "Exxon Mobil Corp.",
+      "current_price": "105.45",
+      "current_daily_high": "105.45",
+      "current_daily_low": "105.45"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 15,
+    "fields": {
+      "ticker": "MA",
+      "company_name": "Mastercard Inc.",
+      "current_price": "395.20",
+      "current_daily_high": "395.20",
+      "current_daily_low": "395.20"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 16,
+    "fields": {
+      "ticker": "PG",
+      "company_name": "Procter & Gamble Co.",
+      "current_price": "150.35",
+      "current_daily_high": "150.35",
+      "current_daily_low": "150.35"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 17,
+    "fields": {
+      "ticker": "COST",
+      "company_name": "Costco Wholesale Corp.",
+      "current_price": "565.40",
+      "current_daily_high": "565.40",
+      "current_daily_low": "565.40"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 18,
+    "fields": {
+      "ticker": "JNJ",
+      "company_name": "Johnson & Johnson",
+      "current_price": "155.90",
+      "current_daily_high": "155.90",
+      "current_daily_low": "155.90"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 19,
+    "fields": {
+      "ticker": "HD",
+      "company_name": "Home Depot Inc.",
+      "current_price": "310.15",
+      "current_daily_high": "310.15",
+      "current_daily_low": "310.15"
+    }
+  },
+  {
+    "model": "stock_market.stock",
+    "pk": 20,
+    "fields": {
+      "ticker": "NFLX",
+      "company_name": "Netflix Inc.",
+      "current_price": "435.60",
+      "current_daily_high": "435.60",
+      "current_daily_low": "435.60"
+    }
+  }
+]

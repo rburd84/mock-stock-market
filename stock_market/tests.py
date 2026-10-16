@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from .models import Stock, UserProfile, PortfolioHolding, Transaction
+from .services import simulate_market_tick
 
 
 class StockMarketTradingTests(TestCase):
@@ -63,7 +64,9 @@ class StockMarketTradingTests(TestCase):
         with self.assertRaises(ValidationError):
             self.profile.buy_stock(self.apple_stock, quantity=-5)
 
-    """ Testing selling Stock """
+
+            """ Testing selling Stock """
+
     def test_successful_stock_sell(self):
         """ Verifies a stock selling """
 
@@ -93,6 +96,34 @@ class StockMarketTradingTests(TestCase):
         self.assertEqual(latest_transaction.transaction_type, "SELL")
         self.assertEqual(latest_transaction.shares_quantity, 3)
 
+
+
+        """ Testing selling Stock """
+
+        def test_market_price_fluctuation(self):
+            """ Verifies market ticks change price """
+            # Capture initial baseline
+            original_price = self.apple_stock.current_price
+            print("Original", original_price)
+
+            # Trigger market tick service
+            simulate_market_tick()
+
+            # Pull updated data
+            self.profile.refresh_from_db()
+            new_price = self.apple_stock.current_price
+
+            print({original_price, new_price})
+
+            # Verify Price movement
+            self.assertNotEqual(original_price, new_price)
+
+            # Verify movement within constraints
+            max_allowed_price = original_price * Decimal("1.02")
+            min_allowed_price = original_price * Decimal("0.98")
+
+            self.assertLessEqual(new_price, max_allowed_price)
+            self.assertGreaterEqual(new_price, min_allowed_price)
 
 
 

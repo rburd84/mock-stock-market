@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Stock Exchange - Dashboard</title>
+    <style>
+        /*body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f9; }*/
+        /*.header-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }*/
+        /*!*table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }*!*/
+        /*th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }*/
+        /*th { background-color: #333; color: white; }*/
+        /*.btn { padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-right: 5px; }*/
+        /*.btn-buy { background-color: #28a745; color: white; }*/
+        /*.btn-sell { background-color: #dc3545; color: white; }*/
+    </style>
+</head>
+<body>
+
+    <!-- 1. The Welcome & Portfolio Cash Banner -->
+    <div class="header-panel">
+        <h2>Welcome back, {{ request.user.username }}!</h2>
+        <p>Available Uninvested Cash: <strong>${{ profile.cash_balance }}</strong></p>
+    </div>
+
+    <!-- 2. The Main Ticker Exchange Board -->
+    <h3>Live Market Listings</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Company Name</th>
+                <th>Current Price</th>
+                <th>Daily High</th>
+                <th>Daily Low</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 3. Loop through the stock payload provided by the view -->
+            {% for stock in stocks %}
+            <tr>
+                <td><a href="#"><strong>{{ stock.ticker }}</strong></a></td>
+                <td>{{ stock.company_name }}</td>
+                <td>${{ stock.current_price }}</td>
+                <td>${{ stock.current_daily_high }}</td>
+                <td>${{ stock.current_daily_low }}</td>
+                <td>
+                    <!-- Placeholders for the trade forms we will build next -->
+                    <a href="#" class="btn btn-buy">Buy</a>
+                    <a href="#" class="btn btn-sell">Sell</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">The market exchange is currently closed. No stocks found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

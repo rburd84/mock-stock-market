@@ -1,4 +1,5 @@
 from decimal import Decimal
+import random
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -9,6 +10,36 @@ class Stock(models.Model):
     ticker = models.CharField(max_length=10, unique=True)
     company_name = models.CharField(max_length=100)
     current_price = models.DecimalField(max_digits=10, decimal_places=2)
+    current_daily_high = models.DecimalField(max_digits=10, decimal_places=2)
+    current_daily_low = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def update_market_price(self, max_volatility=0.02):
+        """ Simulate the market price for this stock """
+
+        # Generate a random float between (-0.02, 0.02)
+        percentage_change = random.uniform(-max_volatility, max_volatility)
+
+        # Convert the float to Decimal
+        price_delta = self.current_price * Decimal(str(percentage_change))
+
+        # Calculate the new price
+        new_price = self.current_price + price_delta
+
+        # Price Flooring
+        price_floor = Decimal("0.01")
+        if new_price < price_floor:
+            new_price = price_floor
+
+        # Check for new daily high
+        if new_price > self.current_daily_high:
+            self.current_daily_high = new_price
+
+        # Check for new daily low
+        if new_price < self.current_daily_low:
+            self.current_daily_low = new_price
+
+        self.current_price = round(new_price, 2)
+        self.save()
 
     def __str__(self):
         return f"{self.ticker} - {self.company_name}"

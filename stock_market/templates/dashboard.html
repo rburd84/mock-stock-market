@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+
+    <!-- 1. The Welcome & Portfolio Cash Banner -->
+    <div class="header-panel">
+        <h2>Welcome back, {{ request.user.username }}!</h2>
+        <p>Available Uninvested Cash: <strong>${{ profile.cash_balance }}</strong></p>
+    </div>
+
+    <!-- 2. The Main Ticker Exchange Board -->
+    <h3>Live Market Listings</h3>
+    <div class="table_responsive">
+        <table class="table table-striped align-middle table-stackable">
+            <thead>
+                <tr>
+                    <th scope="col">Ticker</th>
+                    <th scope="col">Company Name</th>
+                    <th scope="col">Current Price</th>
+                    <th scope="col">Daily High</th>
+                    <th scope="col">Daily Low</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- 3. Loop through the stock payload provided by the view -->
+                {% for stock in stocks %}
+                <tr>
+                    <td data-label="Ticker"><a href="#"><strong>{{ stock.ticker }}</strong></a></td>
+                    <td data-label="Company">{{ stock.company_name }}</td>
+                    <td data-label="Price">${{ stock.current_price }}</td>
+                    <td data-label="High">${{ stock.current_daily_high }}</td>
+                    <td data-label="Low">${{ stock.current_daily_low }}</td>
+                    <td data-label="Actions" class="actions-cell">
+                        <!-- Placeholders for the trade forms we will build next -->
+                        <a href="#" class="btn btn-success btn-sm me-2"><i class="bi bi-cart-plus"></i> Buy</a>
+                        <a href="#" class="btn btn-danger btn-sm"><i class="bi bi-cash-coin"></i> Sell</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3 empty-state">
+                        The market exchange is currently closed. No stocks found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock content %}
