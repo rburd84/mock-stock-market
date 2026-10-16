@@ -57,6 +57,46 @@ class UserProfile(models.Model):
 
         return f"Successfully brought {quantity} shares of {stock.ticker}."
 
+    def sell_stock(self, stock, quantity):
+        """ Execute a stock sell, update cash, holdings and log transaction record """
+
+        if quantity <= 0:
+            raise ValidationError("Quantity must be greater than zero.")
+
+        with transaction.atomic():
+            try:
+                holding = PortfolioHolding.objects.select_for_update().get(user_profile=self, stock=stock)
+            except PortfolioHolding.DoesNotExist:
+                raise ValidationError(f"You do not own any shares of this stock.")
+
+            if holding.shares_owned <= 0:
+                raise ValidationError("You must own the stock to sell.")
+
+            if quantity > holding.shares_owned:
+                raise ValidationError(
+                    f"Insufficient shares. You want to sell {quantity}, "
+                    f"but only own {holding.shares_owned}."
+                )
+
+            sale_amount = quantity * stock.current_price
+            self.cash_balance += sale_amount
+            self.save()
+
+            # Subtract the shares from portfolio
+            holding.subtract_shares(quantity, stock.current_price)
+
+            # Log transaction into history ledger
+            Transaction.objects.create(
+                user_profile=self,
+                stock=stock,
+                transaction_type='SELL',
+                shares_quantity=quantity,
+                price_per_share=stock.current_price
+            )
+
+        return f"Successfully sold {quantity} shares of {stock.ticker}."
+
+
     def __str__(self):
         return f"{self.user.username}'s profile"
 
@@ -71,20 +111,29 @@ class PortfolioHolding(models.Model):
         """ Eliminates duplicate entries """
         unique_together = ('user_profile', 'stock')
 
-    def add_shares(self, new_quantity, execution_price):
+    def add_shares(self, add_quantity, execution_price):
         """ Update total shares owned and recalculate the average cost """
-        total_shares = self.shares_owned + new_quantity
+        total_shares = self.shares_owned + add_quantity
 
         # Calculate new weighted average cost basis
         current_total_cost = self.shares_owned * self.average_buy_price
-        new_total_cost = new_quantity * execution_price
+        new_total_cost = add_quantity * execution_price
 
         self.average_buy_price = (current_total_cost + new_total_cost) / total_shares
         self.shares_owned = total_shares
         self.save()
 
+    def subtract_shares(self, subtract_quantity, execution_price):
+        """ Update total shares owned and recalculate the average cost """
+        self.shares_owned -=  subtract_quantity
+
+        if self.shares_owned == 0:
+            self.delete()
+        else:
+            self.save()
+
     def __str__(self):
-        return f"{self.user_profile.username} owns {self.shares_owned} shares of {self.stock}"
+        return f"{self.user_profile.user.username} owns {self.shares_owned} shares of {self.stock}"
 
 
 class Transaction(models.Model):

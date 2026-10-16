@@ -20,6 +20,7 @@ class StockMarketTradingTests(TestCase):
             current_price=Decimal("150.00")
         )
 
+    """ Testing Buying Stock """
     def test_successful_stock_purchase(self):
         """ Verifies a valid purchase, updates cash, holdings, and records transaction """
         # Buy 2 shares of Apple ($150 * 2 = $300 total cost)
@@ -62,8 +63,35 @@ class StockMarketTradingTests(TestCase):
         with self.assertRaises(ValidationError):
             self.profile.buy_stock(self.apple_stock, quantity=-5)
 
+    """ Testing selling Stock """
+    def test_successful_stock_sell(self):
+        """ Verifies a stock selling """
 
+        # Simulate stock buy
+        PortfolioHolding.objects.create(user_profile=self.profile,
+                                        stock=self.apple_stock,
+                                        shares_owned=4,
+                                        average_buy_price=Decimal("150.00"))
+        print("\nProfile", self.profile.cash_balance)
+        starting_cash = self.profile.cash_balance
+        cash_from_sale = starting_cash + (3 * self.apple_stock.current_price)
 
+        result_message = self.profile.sell_stock(self.apple_stock, quantity=3)
+        print(result_message)
+
+        latest_transaction = Transaction.objects.latest('timestamp')
+
+        self.profile.refresh_from_db()
+
+        holding = PortfolioHolding.objects.get(user_profile=self.profile, stock=self.apple_stock)
+        print("Portfolio Holdings", holding)
+        print("starting_cash", starting_cash)
+        print("cash_from_sale", cash_from_sale)
+
+        self.assertEqual(self.profile.cash_balance, starting_cash + 3 * self.apple_stock.current_price)
+        self.assertEqual(holding.shares_owned, 1)
+        self.assertEqual(latest_transaction.transaction_type, "SELL")
+        self.assertEqual(latest_transaction.shares_quantity, 3)
 
 
 
