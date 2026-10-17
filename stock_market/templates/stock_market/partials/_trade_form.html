@@ -1,0 +1,52 @@
+
+<form action="{% url 'execute_trade' %}" method="POST">
+    <!-- Django Security Token (Mandatory for all POST submissions) -->
+    {% csrf_token %}
+
+    <!-- Hidden metadata fields keeping tracking parameters intact -->
+    <input type="hidden" name="ticker" value="{{ stock.ticker }}">
+    <input type="hidden" name="trade_type" value="{{ trade_type }}">
+
+    <!-- Context Meta Block -->
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+        <div>
+            <h4 class="h5 mb-0">{{ stock.company_name }} ({{ stock.ticker }})</h4>
+            <small class="text-muted">Live Price: <strong>${{ stock.current_price }}</strong></small>
+        </div>
+        <span class="badge {% if trade_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %} px-3 py-2 fs-6">
+            {{ trade_type }} ORDER
+        </span>
+    </div>
+
+    <!-- Personal Balance Insight Block -->
+    <div class="alert alert-secondary py-2 border-0 mb-3 fs-7" style="font-size: 0.85rem;">
+        {% if trade_type == 'BUY' %}
+            <i class="bi bi-wallet2 me-1"></i> Buying Power Available: <strong>${{ profile.cash_balance }}</strong>
+        {% else %}
+            <i class="bi bi-briefcase me-1"></i> Shares Currently Owned: <strong>{{ shares_owned }} shares</strong>
+        {% endif %}
+    </div>
+
+    <!-- Input Element Block -->
+    <div class="mb-4">
+        <label for="quantityInput" class="form-label font-weight-bold text-secondary">Number of Shares</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-calculator"></i></span>
+            <input type="number"
+                   class="form-control form-control-lg text-center"
+                   id="quantityInput"
+                   name="quantity"
+                   min="1"
+                   placeholder="0"
+                   required>
+        </div>
+    </div>
+
+    <!-- Operational Controls Group -->
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn {% if trade_type == 'BUY' %}btn-success{% else %}btn-danger{% endif %} px-4">
+            Confirm {{ trade_type }}
+        </button>
+    </div>
+</form>

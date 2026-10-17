@@ -1,8 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
 from django.views.generic import ListView
 
-from stock_market.models import Stock
+from stock_market.models import Stock, PortfolioHolding
 
 
 class MarketDashboardView(LoginRequiredMixin, ListView):
@@ -20,3 +23,76 @@ class MarketDashboardView(LoginRequiredMixin, ListView):
         context['profile'] = self.request.user.profile
 
         return context
+
+class TradeFormEndpointView(LoginRequiredMixin, View):
+    def get(self, request, ticker):
+        # Fetch requested stock
+        stock = get_object_or_404(Stock, ticker=ticker)
+
+        # Extract context from buttons
+        trade_type = request.GET.get('type', 'BUY').upper()
+
+        holding = PortfolioHolding.objects.filter(user_profile=request.user.profile, stock=stock).first()
+        shares_owned = holding.shares_owned if holding else 0
+
+        context = {
+            'stock': stock,
+            'trade_type': trade_type,
+            'profile': request.user.profile,
+            'shares_owned': shares_owned,
+        }
+
+        return render(request, 'stock_market/partials/_trade_form.html', context)
+
+    pass
+
+
+class ExecuteTradeView(LoginRequiredMixin, View):
+    def post(self, request):
+        ticker = request.POST.get('ticker')
+        trade_type = request.POST.get('type', 'BUY').upper()
+
+        try:
+            quantity = int(request.POST.get('quantity', 0))
+        except ValueError as e:
+            messages.error(request, 'Invalid Entry. Quantity must be a whole number.')
+            return redirect('market_dashboard')
+
+        stock = get_object_or_404(Stock, ticker=ticker)
+        user_profile = request.user.profile
+
+        try:
+            if trade_type == 'BUY':
+                message = user_profile.buy_stock(stock, quantity)
+            elif trade_type == 'SELL':
+                message = user_profile.sell_stock(stock, quantity)
+            else:
+                raise ValidationError('Invalid order configuration.')
+
+            messages.success(request, message)
+
+        except ValidationError as e:
+            messages.error(request, e.message)
+
+
+        return redirect("market_dashboard")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
