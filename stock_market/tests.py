@@ -12,13 +12,19 @@ class StockMarketTradingTests(TestCase):
         """ Set up mock data for testing purposes """
         # Create a dummy base Django user and profile
         self.user = User.objects.create_user(username='testtrader',  password='pasword123')
-        self.profile = UserProfile.objects.create(user=self.user, cash_balance=Decimal("1000.00"))
+        # self.profile = UserProfile.objects.create(user=self.user, cash_balance=Decimal("1000.00"))
+
+        self.profile = self.user.profile
+        self.profile.cash_balance = Decimal("1000.00")
+        self.profile.save()
 
         # Create a mock stock (Apple) priced at $150.00
         self.apple_stock = Stock.objects.create(
             ticker="AAPL",
             company_name="Apple Inc.",
-            current_price=Decimal("150.00")
+            current_price=Decimal("150.00"),
+            current_daily_high=Decimal("150.00"),
+            current_daily_low=Decimal("150.00")
         )
 
     """ Testing Buying Stock """
@@ -95,6 +101,41 @@ class StockMarketTradingTests(TestCase):
         self.assertEqual(holding.shares_owned, 1)
         self.assertEqual(latest_transaction.transaction_type, "SELL")
         self.assertEqual(latest_transaction.shares_quantity, 3)
+
+    def test_cannot_sell_unowned_stock(self):
+        tesla_stock = Stock.objects.create(
+            ticker="TSLA",
+            company_name="Tesla Inc.",
+            current_price=Decimal("200.00"),
+            current_daily_high=Decimal("200.00"),
+            current_daily_low=Decimal("200.00")
+        )
+        starting_cash = self.profile.cash_balance
+
+        with self.assertRaises(ValidationError):
+            self.profile.sell_stock(tesla_stock, quantity=10)
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.cash_balance, starting_cash)
+
+    def test_cannot_oversell_shares(self):
+        """Verifies that a user cannot sell more shares than they currently own."""
+        # 1. Setup pre-condition state: user owns exactly 2 shares of Apple
+        PortfolioHolding.objects.create(
+            user_profile=self.profile,
+            stock=self.apple_stock,
+            shares_owned=2,
+            average_buy_price=Decimal("150.00")
+        )
+        starting_cash = self.profile.cash_balance
+
+        # 2. ASSERTION: Trying to sell 10 shares when they only own 2 must throw an error
+        with self.assertRaises(ValidationError):
+            self.profile.sell_stock(self.apple_stock, quantity=10)
+
+        # 3. Verify state rolled back cleanly and cash didn't shift
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.cash_balance, starting_cash)
 
 
 

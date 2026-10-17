@@ -50,7 +50,7 @@ class TradeFormEndpointView(LoginRequiredMixin, View):
 class ExecuteTradeView(LoginRequiredMixin, View):
     def post(self, request):
         ticker = request.POST.get('ticker')
-        trade_type = request.POST.get('type', 'BUY').upper()
+        trade_type = request.POST.get('trade_type', '').upper()
 
         try:
             quantity = int(request.POST.get('quantity', 0))
