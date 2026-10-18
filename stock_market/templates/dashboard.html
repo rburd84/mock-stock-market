@@ -36,9 +36,10 @@
             <!-- 3. Loop through the stock payload provided by the view -->
             {% for stock in stocks %}
             <tr>
-                <td data-label="Ticker"><a href="#"><strong>{{ stock.ticker }}</strong></a></td>
+                <td data-label="Ticker"><a href="{% url 'stock_detail' ticker=stock.ticker %}"
+                class="text-decoration-none text-primary"><strong>{{ stock.ticker }}</strong></a></td>
                 <td data-label="Company">{{ stock.company_name }}</td>
-                <td data-label="Price">${{ stock.current_price }}</td>
+                <td data-label="Price" class="fw-bold">${{ stock.current_price }}</td>
                 <td data-label="High">${{ stock.current_daily_high }}</td>
                 <td data-label="Low">${{ stock.current_daily_low }}</td>
                 <td data-label="Actions" class="actions-cell">

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="container my-4">
+        <!-- Back Navigation Shortcut link anchor -->
+        <a href="{% url 'market_dashboard' %}" class="btn btn-link text-decoration-none p-0 mb-3 text-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Live Market listings
+        </a>
+
+        <!-- System Response Messages Frame Alerts -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Two Column Interactive Responsive Grid System -->
+        <div class="row g-4">
+
+            <!-- COLUMN 1: Analytical Market Information (8 Units Wide) -->
+            <div class="col-lg-8">
+                <!-- Core Valuation Dashboard Header Metadata Panel -->
+                <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                        <div>
+                            <span class="badge bg-secondary mb-2 fs-6 px-3">{{ stock.ticker }}</span>
+                            <h1 class="h2 text-dark font-weight-bold mb-1">{{ stock.company_name }}</h1>
+                        </div>
+                        <div class="text-lg-end mt-2 mt-lg-0">
+                            <small class="text-muted d-block text-uppercase fw-bold tracking-wider" style="font-size: 0.75rem;">Current Price</small>
+                            <span class="h1 fw-bold text-dark">${{ stock.current_price }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Daily Fluctuation Bound Metric Badges -->
+                    <div class="row g-3 mt-3 pt-3 border-top">
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block mb-1">Daily High</small>
+                            <span class="fs-5 fw-bold text-success">
+                                <i class="bi bi-caret-up-fill small"></i> ${{ stock.current_daily_high }}
+                            </span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block mb-1">Daily Low</small>
+                            <span class="fs-5 fw-bold text-danger">
+                                <i class="bi bi-caret-down-fill small"></i> ${{ stock.current_daily_low }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Future Scalability Content Box Placeholder (Price Graph Canvas Frame) -->
+                <div class="card p-4 border-0 shadow-sm bg-white text-center py-5">
+                    <div class="py-5 text-muted">
+                        <i class="bi bi-activity text-secondary display-4 mb-3 d-block"></i>
+                        <h4 class="h5 font-weight-bold text-dark mb-1">Historical Pricing Canvas</h4>
+                        <p class="small mb-0 px-md-5">This layout container stands ready as a structural placeholder. In a future milestone, we will load a charting library (like Chart.js) to map out live ticks and price fluctuations over time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: Personal Holding Status & Interactive Action Controls Sidebar (4 Units Wide) -->
+            <div class="col-lg-4">
+
+                <!-- Card Component A: User Position Summary Summary -->
+                <div class="card border-0 shadow-sm mb-4 bg-white overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="card-title h6 mb-0"><i class="bi bi-briefcase me-2"></i>Your Asset Position</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if shares_owned > 0 %}
+                            <!-- Display if the logged-in trader holds inventory inventory shares -->
+                            <div class="row g-3 mb-3 text-center">
+                                <div class="col-6 border-end">
+                                    <small class="text-muted d-block mb-1">Shares Owned</small>
+                                    <strong class="fs-4 text-dark">{{ shares_owned }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block mb-1">Avg Cost Basis</small>
+                                    <strong class="fs-4 text-dark">${{ avg_buy_price }}</strong>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-light rounded text-center border">
+                                <small class="text-muted d-block mb-1">Current Market Value</small>
+                                <div class="fs-5 fw-bold text-dark mb-2">${{ market_value|floatformat:2 }}</div>
+
+                                <small class="text-muted d-block mb-1">Total Return (Unrealized)</small>
+                                <span class="fs-6 fw-bold {% if unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="bi {% if unrealized_pnl >= 0 %}bi-plus-circle-fill{% else %}bi-dash-circle-fill{% endif %} me-1"></i>
+                                    ${{ unrealized_pnl|floatformat:2 }}
+                                </span>
+                            </div>
+                        {% else %}
+                            <!-- Fallback layout display if the trader holds no shares -->
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-wallet2 display-6 mb-2 d-block text-secondary"></i>
+                                <p class="mb-0">You hold no active position in this stock asset.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Card Component B: Transaction Order Panel CTA Dashboard -->
+                <div class="card border-0 shadow-sm bg-white">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="card-title h6 mb-0"><i class="bi bi-arrow-left-right me-2"></i>Order Entry Desk</h5>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <p class="small text-muted text-start mb-3">Available Liquid Buying Power Cash: <strong class="text-success">${{ profile.cash_balance }}</strong></p>
+
+                        <!-- REUSED MODAL TRIGGERS: Data attributes exactly match our async framework! -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg open-trade-modal" data-ticker="{{ stock.ticker }}" data-trade-type="BUY">
+                                <i class="bi bi-cart-plus me-2"></i>Place Buy Order
+                            </button>
+                            <button class="btn btn-danger btn-lg open-trade-modal" data-ticker="{{ stock.ticker }}" data-trade-type="SELL" {% if shares_owned == 0 %}disabled{% endif %}>
+                                <i class="bi bi-cash-coin me-2"></i>Place Sell Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARED MODAL WRAPPER CONTAINER: Re-built exactly identical to host incoming forms -->
+    <div class="modal fade" id="tradeExecutionModal" tabindex="-1" aria-labelledby="tradeExecutionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="tradeExecutionModalLabel">
+                        <i class="bi bi-arrow-left-right me-2"></i>Configure Order
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="modalFormContainer">
+                    <div class="text-center py-3 text-muted">
+                        <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
+                        Loading order details...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}

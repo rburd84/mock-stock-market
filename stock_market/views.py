@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from stock_market.models import Stock, PortfolioHolding
 
@@ -77,6 +77,40 @@ class ExecuteTradeView(LoginRequiredMixin, View):
 
         return redirect("market_dashboard")
 
+
+class StockDetailView(LoginRequiredMixin, DetailView):
+    model = Stock
+    template_name = 'stock_detail.html'
+    context_object_name = 'stock'
+    slug_field = 'ticker'
+    slug_url_kwarg = 'ticker'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_profile = self.request.user.profile
+        current_stock = self.object
+
+        holding = PortfolioHolding.objects.filter(
+            user_profile=user_profile).first()
+
+        if holding:
+            context['shares_owned'] = holding.shares_owned
+            context['avg_buy_price'] = holding.average_buy_price
+
+            total_cost_basis = holding.shares_owned * holding.average_buy_price
+            current_market_value = holding.shares_owned * current_stock.current_price
+            context['market_value'] = current_market_value
+            context['unrealized_pnl'] = current_market_value - total_cost_basis
+        else:
+            context['shares_owned'] = 0
+            context['avg_buy_price'] = 0
+            context['market_value'] = 0
+            context['unrealized_pnl'] = 0
+
+        context['profile'] = user_profile
+
+        return context
 
 
 
