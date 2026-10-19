@@ -75,7 +75,7 @@ class ExecuteTradeView(LoginRequiredMixin, View):
             messages.error(request, e.message)
 
 
-        return redirect("market_dashboard")
+        return redirect(request.META.get("HTTP_REFERER", "market_dashboard"))
 
 
 class StockDetailView(LoginRequiredMixin, DetailView):
@@ -92,7 +92,9 @@ class StockDetailView(LoginRequiredMixin, DetailView):
         current_stock = self.object
 
         holding = PortfolioHolding.objects.filter(
-            user_profile=user_profile).first()
+            user_profile=user_profile,
+            stock=current_stock
+        ).first()
 
         if holding:
             context['shares_owned'] = holding.shares_owned

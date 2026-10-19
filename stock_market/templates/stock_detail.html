@@ -71,7 +71,7 @@
                         <h5 class="card-title h6 mb-0"><i class="bi bi-briefcase me-2"></i>Your Asset Position</h5>
                     </div>
                     <div class="card-body p-4">
-                        {% if shares_owned > 0 %}
+                        {% if shares_owned and shares_owned > 0 %}
                             <!-- Display if the logged-in trader holds inventory inventory shares -->
                             <div class="row g-3 mb-3 text-center">
                                 <div class="col-6 border-end">
@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="col-6">
                                     <small class="text-muted d-block mb-1">Avg Cost Basis</small>
-                                    <strong class="fs-4 text-dark">${{ avg_buy_price }}</strong>
+                                    <strong class="fs-4 text-dark">${{ avg_buy_price|floatformat:2 }}</strong>
                                 </div>
                             </div>
                             <div class="p-3 bg-light rounded text-center border">
