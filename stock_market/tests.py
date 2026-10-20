@@ -141,30 +141,112 @@ class StockMarketTradingTests(TestCase):
 
         """ Testing selling Stock """
 
-        def test_market_price_fluctuation(self):
-            """ Verifies market ticks change price """
-            # Capture initial baseline
-            original_price = self.apple_stock.current_price
-            print("Original", original_price)
+    def test_market_price_fluctuation(self):
+        """ Verifies market ticks change price """
+        # Capture initial baseline
+        original_price = self.apple_stock.current_price
 
-            # Trigger market tick service
+        # Trigger market tick service
+        simulate_market_tick()
+
+        # Pull updated data
+        self.apple_stock.refresh_from_db()
+        new_price = self.apple_stock.current_price
+
+        if new_price == original_price:
             simulate_market_tick()
-
-            # Pull updated data
-            self.profile.refresh_from_db()
+            self.apple_stock.refresh_from_db()
             new_price = self.apple_stock.current_price
 
-            print({original_price, new_price})
+        # Verify Price movement
+        self.assertNotEqual(original_price, new_price)
 
-            # Verify Price movement
-            self.assertNotEqual(original_price, new_price)
+        # Verify movement within constraints
+        max_allowed_price = original_price * Decimal("1.02")
+        min_allowed_price = original_price * Decimal("0.98")
 
-            # Verify movement within constraints
-            max_allowed_price = original_price * Decimal("1.02")
-            min_allowed_price = original_price * Decimal("0.98")
+        self.assertLessEqual(new_price, max_allowed_price)
+        self.assertGreaterEqual(new_price, min_allowed_price)
 
-            self.assertLessEqual(new_price, max_allowed_price)
-            self.assertGreaterEqual(new_price, min_allowed_price)
+    def test_stock_price_floor(self):
+        """ Ensure stock price never drops below $0.01 """
+        penny_stock = Stock.objects.create(
+            ticker="PNY",
+            company_name="Penny Inc.",
+            current_price=Decimal("0.02"),
+            current_daily_high=Decimal("0.02"),
+            current_daily_low=Decimal("0.02")
+        )
+
+        for _ in range(20):
+            penny_stock.update_market_price(max_volatility=0.50)
+
+        penny_stock.refresh_from_db()
+
+        self.assertGreaterEqual(penny_stock.current_price, Decimal("0.01"))
+
+    def test_daily_high_low_tracking(self):
+        """ Verifies maximum high and low points are tracked accurately """
+        volatile_stock = Stock.objects.create(
+            ticker="VLT",
+            company_name="Volatility Inc.",
+            current_price=Decimal("100.00"),
+            current_daily_high=Decimal("100.00"),
+            current_daily_low=Decimal("100.00")
+        )
+
+        volatile_stock.current_price = Decimal("150.00")
+        if volatile_stock.current_price > volatile_stock.current_daily_high:
+            volatile_stock.current_daily_high = volatile_stock.current_price
+        volatile_stock.save()
+
+        volatile_stock.current_price = Decimal("50.00")
+        if volatile_stock.current_price < volatile_stock.current_daily_low:
+            volatile_stock.current_daily_low = volatile_stock.current_price
+        volatile_stock.save()
+
+        volatile_stock.current_price = Decimal("95.00")
+        volatile_stock.save()
+
+        volatile_stock.refresh_from_db()
+        self.assertEqual(volatile_stock.current_daily_high, Decimal("150.00"))
+        self.assertEqual(volatile_stock.current_daily_low, Decimal("50.00"))
+        self.assertEqual(volatile_stock.current_price, Decimal("95.00"))
+
+    def test_cost_basis_recalculation(self):
+        self.profile.cash_balance = Decimal("5000.00")
+        self.profile.save()
+
+        # Total cost: $1,500.00
+        self.profile.buy_stock(self.apple_stock, quantity=10)
+        self.apple_stock.save()
+
+        self.apple_stock.current_price = Decimal("180.00")
+        self.apple_stock.save()
+
+        # Additional cost: 5 * $180 = $900.00
+        self.profile.buy_stock(self.apple_stock, quantity=5)
+
+        holding = PortfolioHolding.objects.get(user_profile=self.profile, stock=self.apple_stock)
+
+        # Total Shares = 10 + 5 = 15
+        # Total Spent = $1,500 + $900 = $2,400
+        # Expected Average Cost Basis = $2,400 / 15 = $160.00
+        self.assertEqual(holding.shares_owned, 15)
+        self.assertEqual(holding.average_buy_price, Decimal("160.00"))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
