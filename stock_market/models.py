@@ -183,3 +183,4 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.transaction_type} | {self.shares_quantity} {self.stock.ticker} at ${self.price_per_share}"
+
