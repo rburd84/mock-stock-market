@@ -1,9 +1,14 @@
 from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+
 
 from stock_market.models import Stock, PortfolioHolding, Transaction
 
@@ -116,7 +121,7 @@ class StockDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class UserPortfolio(LoginRequiredMixin, View):
+class UserPortfolioView(LoginRequiredMixin, View):
     def get(self, request):
         user_profile = request.user.profile
 
@@ -161,6 +166,25 @@ class UserPortfolio(LoginRequiredMixin, View):
             return render(request, "portfolio.html", context)
 
 
+class UserSignUpView(CreateView):
+
+    form_class = UserCreationForm
+    template_name = 'registration/signup.html'
+    success_url = reverse_lazy('market_dashboard')
+
+    def form_valid(self, form):
+        """ Create new user in database """
+        response = super().form_valid(form)
+        """ Login new user """
+        login(self.request, self.object)
+
+        return response
+
+    def get(self, request, *args, **kwargs):
+        """ Restrict logged in users return to signup page """
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(self.success_url)
+        return super().get(request, *args, **kwargs)
 
 
 
