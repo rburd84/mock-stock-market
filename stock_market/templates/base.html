@@ -19,54 +19,43 @@
     </style>
 </head>
 <body>
-<div class="container-fluid bg-dark">
-    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/"
-           class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
-            <svg class="bi me-2"
-                 width="40"
-                 height="32"
-                 role="img"
-                 aria-label="Bootstrap">
-                <use xlink:href="#bootstrap"/>
-            </svg>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    <!-- 1. FIX: Changed container-fluid to container to bring margins in from the edge -->
+    <div class="container">
+
+        <!-- BRAND LOGO: Stays visible on the left on all device viewports -->
+        <a class="navbar-brand fw-bold" href="{% url 'market_dashboard' %}">
+            <i class="bi bi-graph-up-arrow me-2 text-success"></i>Mock Exchange
         </a>
-        <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li>
-                <a href="{% url 'market_dashboard' %}"
-                   class="nav-link text-secondary">
-                    <i class="bi bi-house-door d-block mx-auto mb-1 text-center"
-                       style="font-size: 24px;"></i>
-                    Home
+
+        <!-- MOBILE HAMBURGER BUTTON: Appears automatically when screens become narrow -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#responsiveNavbarMain"
+                aria-controls="responsiveNavbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- THE COLLAPSIBLE WRAPPER: Handles centering on desktop, and vertical stacking on mobile -->
+        <div class="collapse navbar-collapse" id="responsiveNavbarMain">
+
+            <!-- CENTRAL LINKS: Flex rules center these items on desktop screens -->
+            <div class="navbar-nav mx-auto gap-lg-3 my-2 my-lg-0 text-center">
+                <a class="nav-link text-white-50" href="{% url 'market_dashboard' %}">
+                    <i class="bi bi-speedometer2 me-1"></i> Market Dashboard
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'market_dashboard' %}"
-                   class="nav-link text-white">
-                    <i class="bi bi-speedometer2 d-block mx-auto mb-1 text-center"
-                       style="font-size: 24px;"></i>
-                    Dashboard
+                <a class="nav-link active fw-bold text-white" href="{% url 'user_portfolio' %}">
+                    <i class="bi bi-briefcase me-1"></i> My Portfolio
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'market_dashboard' %}"
-                   class="nav-link text-white">
-                    <i class="bi bi-briefcase-fill d-block mx-auto mb-1 text-center"
-                       style="font-size: 24px;"></i>
-                    Portfolio
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'market_dashboard' %}"
-                   class="nav-link text-white">
-                    <i class="bi bi-clock-history d-block mx-auto mb-1 text-center"
-                       style="font-size: 24px;"></i>
-                    Transactions
-                </a>
-            </li>
-        </ul>
+            </div>
+
+            <!-- RIGHT STATUS: Auto-aligns nicely on the right edge on desktop layouts -->
+            <div class="navbar-text text-white-50 text-center text-lg-end pt-1 pb-2 pb-lg-1">
+                Logged in as: <strong class="text-white">{{ request.user.username }}</strong>
+            </div>
+
+        </div>
+
     </div>
-</div>
+</nav>
 {% block content %}
 {% endblock content %}
 

@@ -1,7 +1,12 @@
 from django.urls import path
 
-from stock_market.views import MarketDashboardView, TradeFormEndpointView, \
-    ExecuteTradeView, StockDetailView, UserPortfolio
+from stock_market.views import (
+    MarketDashboardView,
+    TradeFormEndpointView,
+    ExecuteTradeView,
+    StockDetailView,
+    UserPortfolio
+)
 
 urlpatterns = [
     path('market/', MarketDashboardView.as_view(), name='market_dashboard'),
