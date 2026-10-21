@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView
 
-
+from stock_market.forms import BootstrapUserCreationForm
 from stock_market.models import Stock, PortfolioHolding, Transaction
 
 
@@ -168,7 +168,7 @@ class UserPortfolioView(LoginRequiredMixin, View):
 
 class UserSignUpView(CreateView):
 
-    form_class = UserCreationForm
+    form_class = BootstrapUserCreationForm
     template_name = 'registration/signup.html'
     success_url = reverse_lazy('market_dashboard')
 

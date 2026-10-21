@@ -3,8 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalElement = document.getElementById("tradeExecutionModal");
     const tradeModal = new bootstrap.Modal(modalElement);
     const formContainer = document.getElementById("modalFormContainer");
+    const formInputs = document.querySelectorAll("form input");
 
     const loadingHtml = formContainer.innerHTML;
+
+
+    formInputs.forEach(input => {
+        input.classList.add("form-control");
+    });
 
 
     document.querySelectorAll(".open-trade-modal").forEach(button => {
@@ -36,7 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Fetch Error: ", error);
                 });
         })
-    })
+    });
+
+
 })
 
-console.log("Hello from javascript")
+console.log("Hello from javascript");

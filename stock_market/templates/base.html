@@ -19,25 +19,74 @@
     </style>
 </head>
 <body>
+<!--<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">-->
+<!--    &lt;!&ndash; 1. FIX: Changed container-fluid to container to bring margins in from the edge &ndash;&gt;-->
+<!--    <div class="container">-->
+
+<!--        &lt;!&ndash; BRAND LOGO: Stays visible on the left on all device viewports &ndash;&gt;-->
+<!--        <a class="navbar-brand fw-bold" href="{% url 'market_dashboard' %}">-->
+<!--            <i class="bi bi-graph-up-arrow me-2 text-success"></i>Mock Exchange-->
+<!--        </a>-->
+
+<!--        &lt;!&ndash; MOBILE HAMBURGER BUTTON: Appears automatically when screens become narrow &ndash;&gt;-->
+<!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#responsiveNavbarMain"-->
+<!--                aria-controls="responsiveNavbarMain" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--            <span class="navbar-toggler-icon"></span>-->
+<!--        </button>-->
+
+<!--        &lt;!&ndash; THE COLLAPSIBLE WRAPPER: Handles centering on desktop, and vertical stacking on mobile &ndash;&gt;-->
+<!--        <div class="collapse navbar-collapse" id="responsiveNavbarMain">-->
+
+<!--            &lt;!&ndash; CENTRAL LINKS: Flex rules center these items on desktop screens &ndash;&gt;-->
+<!--            <div class="navbar-nav mx-auto gap-lg-3 my-2 my-lg-0 text-center">-->
+<!--                <a class="nav-link text-white-50" href="{% url 'market_dashboard' %}">-->
+<!--                    <i class="bi bi-speedometer2 me-1"></i> Market Dashboard-->
+<!--                </a>-->
+<!--                <a class="nav-link active fw-bold text-white" href="{% url 'user_portfolio' %}">-->
+<!--                    <i class="bi bi-briefcase me-1"></i> My Portfolio-->
+<!--                </a>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; RIGHT STATUS: Auto-aligns nicely on the right edge on desktop layouts &ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="navbar-text text-white-50 text-center text-lg-end pt-1 pb-2 pb-lg-1">&ndash;&gt;-->
+<!--&lt;!&ndash;                Logged in as: <strong class="text-white">{{ request.user.username }}</strong>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--            <div class="d-flex justify-content-end align-items-center gap-3" style="flex: 1;">-->
+<!--                <span class="navbar-text text-white-50 text-end d-none d-lg-inline">-->
+<!--                    Logged in as: <strong class="text-white">{{ request.user.username }}</strong>-->
+<!--                </span>-->
+<!--                &lt;!&ndash; The secure, direct form submission required by modern Django security standards &ndash;&gt;-->
+<!--                <form action="{% url 'logout' %}" method="POST" class="d-inline m-0">-->
+<!--                    {% csrf_token %}-->
+<!--                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3">-->
+<!--                        <i class="bi bi-box-arrow-right me-1"></i> Logout-->
+<!--                    </button>-->
+<!--                </form>-->
+<!--            </div>-->
+
+<!--        </div>-->
+
+<!--    </div>-->
+<!--</nav>-->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
-    <!-- 1. FIX: Changed container-fluid to container to bring margins in from the edge -->
     <div class="container">
 
-        <!-- BRAND LOGO: Stays visible on the left on all device viewports -->
+        <!-- BRAND LOGO: Kept on the left -->
         <a class="navbar-brand fw-bold" href="{% url 'market_dashboard' %}">
             <i class="bi bi-graph-up-arrow me-2 text-success"></i>Mock Exchange
         </a>
 
-        <!-- MOBILE HAMBURGER BUTTON: Appears automatically when screens become narrow -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#responsiveNavbarMain"
-                aria-controls="responsiveNavbarMain" aria-expanded="false" aria-label="Toggle navigation">
+        <!-- MOBILE HAMBURGER BUTTON -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#responsiveNavbarMain" aria-controls="responsiveNavbarMain" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- THE COLLAPSIBLE WRAPPER: Handles centering on desktop, and vertical stacking on mobile -->
+        <!-- THE COLLAPSIBLE CORES WRAPPER -->
         <div class="collapse navbar-collapse" id="responsiveNavbarMain">
 
-            <!-- CENTRAL LINKS: Flex rules center these items on desktop screens -->
+            <!-- CENTRAL LINKS: Locked back to true horizontal center via mx-auto -->
             <div class="navbar-nav mx-auto gap-lg-3 my-2 my-lg-0 text-center">
                 <a class="nav-link text-white-50" href="{% url 'market_dashboard' %}">
                     <i class="bi bi-speedometer2 me-1"></i> Market Dashboard
@@ -47,15 +96,49 @@
                 </a>
             </div>
 
-            <!-- RIGHT STATUS: Auto-aligns nicely on the right edge on desktop layouts -->
-            <div class="navbar-text text-white-50 text-center text-lg-end pt-1 pb-2 pb-lg-1">
-                Logged in as: <strong class="text-white">{{ request.user.username }}</strong>
+            <!-- RIGHT STATUS: Refactored into a premium dropdown component profile trigger -->
+            <div class="d-flex justify-content-center justify-content-lg-end pt-2 pt-lg-0">
+                <div class="dropdown">
+                    <!-- Dropdown Trigger Button Button -->
+                    <button class="btn btn-outline-light dropdown-toggle btn-sm px-3 fw-bold d-flex align-items-center gap-2"
+                            type="button"
+                            id="userProfileDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ request.user.username }}</span>
+                    </button>
+
+                    <!-- Dropdown Menu Box Container -->
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userProfileDropdown">
+                        <li>
+                            <h6 class="dropdown-header text-uppercase tracking-wider small">Trader Session</h6>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-secondary small" href="{% url 'user_portfolio' %}">
+                                <i class="bi bi-wallet2 me-2"></i>View Cash Portfolio
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="px-2">
+                            <!-- Secure POST form hidden inside dropdown row block link style -->
+                            <form action="{% url 'logout' %}" method="POST" class="m-0 p-0">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item rounded btn text-danger d-flex align-items-center gap-2 w-100 py-2">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <strong>Sign Out Account</strong>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
         </div>
 
     </div>
 </nav>
+
 {% block content %}
 {% endblock content %}
 

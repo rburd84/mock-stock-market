@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from stock_market.views import (
     MarketDashboardView,
@@ -16,4 +17,5 @@ urlpatterns = [
     path('stock/<str:ticker>/', StockDetailView.as_view(), name='stock_detail'),
     path('portfolio/', UserPortfolioView.as_view(), name='user_portfolio'),
     path('accounts/signup/', UserSignUpView.as_view(), name='signup'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

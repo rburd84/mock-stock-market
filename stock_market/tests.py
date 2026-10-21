@@ -1,7 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+
+from django.urls import reverse
+
 from .models import Stock, UserProfile, PortfolioHolding, Transaction
 from .services import simulate_market_tick
 
@@ -237,7 +241,64 @@ class StockMarketTradingTests(TestCase):
 
 
 
+        """ Sign up process testing """
+User = get_user_model()
 
+class UserAuthenticationLifecycleTests(TestCase):
+    """ Test public signup, automated funding, redirect users and logout """
+    def test_public_signup_creates_and_funds_profile(self):
+        signup_url = reverse("signup")
+
+        signup_payload = {
+            "username": "public_trader_bob",
+            "password1": "SecureTradingPass123!",
+            "password2": "SecureTradingPass123!"
+        }
+
+        response = self.client.post(signup_url, signup_payload, follow=True)
+
+        # Verify the database records new user
+        self.assertTrue(User.objects.filter(username="public_trader_bob").exists())
+        new_user = User.objects.get(username="public_trader_bob")
+
+        # Verify user was logged in and redirected
+        self.assertRedirects(response, reverse("market_dashboard"))
+        self.assertEqual(int(self.client.session['_auth_user_id']), new_user.pk)
+
+        # Verify account creation and funding
+        self.assertTrue(UserProfile.objects.filter(user=new_user).exists())
+        self.assertEqual(new_user.profile.cash_balance, Decimal("10000.00"))
+
+    def test_authenticated_user_cannot_access_signup_form(self):
+        """ Tests that the user cannot access signup form after login """
+        test_user = User.objects.create_user(username="activetrader", password="password123")
+        self.client.login(username="activetrader", password="password123")
+
+        # Attempt to navigate to signup after login
+        response = self.client.get(reverse("signup"))
+
+        # Verify they are bounced to dashboard
+        self.assertRedirects(response, reverse("market_dashboard"))
+
+    def test_user_logout_session_termination(self):
+        """ Tests user logout session termination """
+        test_user = User.objects.create_user(username="exitingtrader", password="password123")
+        self.client.login(username="exitingtrader", password="password123")
+
+        # Verify client browser holds valid user key
+        self.assertEqual(int(self.client.session['_auth_user_id']), test_user.pk)
+
+        # Trigger POST to logout route
+        logout_url = reverse("logout")
+        expected_redirect_url = reverse("market_dashboard")
+
+        response = self.client.post(logout_url)
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(response.url, expected_redirect_url)
+        # Verify session token storage is empty and cleared
+        self.assertNotIn("_auth_user_id", self.client.session)
 
 
 
